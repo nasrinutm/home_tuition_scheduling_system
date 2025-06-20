@@ -1,0 +1,3 @@
+admin,admin,admin
+daniel,daniel,parent
+aisha,aisha,parent
