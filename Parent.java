@@ -1,3 +1,4 @@
+
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -7,56 +8,18 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Parent extends Person {
+public class Parent extends Person implements Schedulable{
     private String childName;
 
     public Parent(String name, String username, String password, String childName) {
         super(name, username, password);
         this.childName = childName;
     }
+    
+    // --- METHOD REMOVED ---
+    // cancelMySession has been removed.
 
-    private LocalDate getValidDate(Scanner scanner) {
-        LocalDate parsedDate = null;
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        while (parsedDate == null) {
-            System.out.print("Enter Date (dd-MM-yyyy): ");
-            String dateStr = scanner.nextLine();
-            String[] parts = dateStr.split("-");
-            if (parts.length != 3) {
-                System.out.println("Error: Invalid date format. Please use dd-MM-yyyy.");
-                continue;
-            }
-            try {
-                String day = parts[0].length() == 1 ? "0" + parts[0] : parts[0];
-                String month = parts[1].length() == 1 ? "0" + parts[1] : parts[1];
-                String year = parts[2];
-                String standardizedDateStr = day + "-" + month + "-" + year;
-                parsedDate = LocalDate.parse(standardizedDateStr, dateFormatter);
-
-                // --- NEW VALIDATION: Check for same-day booking after 4 PM ---
-                if (parsedDate.equals(LocalDate.now()) && LocalTime.now().getHour() >= 16) {
-                    System.out.println("Error: It is past 4 PM, so you cannot book a session for today.");
-                    parsedDate = null; // Reset to loop again
-                    continue;
-                }
-
-                LocalDateTime maxBookingDate = LocalDateTime.now().plusMonths(2);
-                if (parsedDate.isBefore(LocalDate.now())) {
-                    System.out.println("Error: Cannot book a session on a past date.");
-                    parsedDate = null; continue;
-                }
-                if (parsedDate.atStartOfDay().isAfter(maxBookingDate)) {
-                    System.out.println("Error: Session must be booked within the next 2 months.");
-                    parsedDate = null;
-                }
-            } catch (DateTimeParseException e) {
-                System.out.println("Error: Invalid date value. Please enter a correct date.");
-            }
-        }
-        return parsedDate;
-    }
-
-    // --- Other methods are unchanged ---
+    @Override
     public void viewSessions(Scheduler scheduler) {
         ArrayList<Session> mySessions = scheduler.getSessionsForParent(this);
         if (mySessions.isEmpty()) {
@@ -148,34 +111,49 @@ public class Parent extends Person {
         saveSessions(scheduler);
     }
     
-    public void cancelMySession(Scanner scanner, Scheduler scheduler) {
-        ArrayList<Session> parentSessions = scheduler.getSessionsForParent(this);
-        if (parentSessions.isEmpty()) {
-            System.out.println("You have no sessions to cancel.");
-            return;
-        }
-        System.out.println("\nSelect a session to cancel:");
-        for (int i = 0; i < parentSessions.size(); i++) {
-            System.out.println((i + 1) + ": " + parentSessions.get(i).getDetails());
-        }
-        System.out.print("Choose session number: ");
-        int sessionIndex = tryReadInt(scanner) - 1;
-        if (sessionIndex < 0 || sessionIndex >= parentSessions.size()) {
-            System.out.println("Invalid session number.");
-            return;
-        }
-        Session sessionToDelete = parentSessions.get(sessionIndex);
-        scheduler.deleteSession(sessionToDelete);
-        System.out.println("Session canceled successfully.");
-        saveSessions(scheduler);
-    }
-    
     public String getChildName() {
         return childName;
     }
     private int tryReadInt(Scanner scanner) {
         try { return Integer.parseInt(scanner.nextLine()); } 
         catch (NumberFormatException e) { return -1; }
+    }
+    private LocalDate getValidDate(Scanner scanner) {
+        LocalDate parsedDate = null;
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        while (parsedDate == null) {
+            System.out.print("Enter Date (dd-MM-yyyy): ");
+            String dateStr = scanner.nextLine();
+            String[] parts = dateStr.split("-");
+            if (parts.length != 3) {
+                System.out.println("Error: Invalid date format. Please use dd-MM-yyyy.");
+                continue;
+            }
+            try {
+                String day = parts[0].length() == 1 ? "0" + parts[0] : parts[0];
+                String month = parts[1].length() == 1 ? "0" + parts[1] : parts[1];
+                String year = parts[2];
+                String standardizedDateStr = day + "-" + month + "-" + year;
+                parsedDate = LocalDate.parse(standardizedDateStr, dateFormatter);
+                if (parsedDate.equals(LocalDate.now()) && LocalTime.now().getHour() >= 16) {
+                    System.out.println("Error: It is past 4 PM, so you cannot book a session for today.");
+                    parsedDate = null; 
+                    continue;
+                }
+                LocalDateTime maxBookingDate = LocalDateTime.now().plusMonths(2);
+                if (parsedDate.isBefore(LocalDate.now())) {
+                    System.out.println("Error: Cannot book a session on a past date.");
+                    parsedDate = null; continue;
+                }
+                if (parsedDate.atStartOfDay().isAfter(maxBookingDate)) {
+                    System.out.println("Error: Session must be booked within the next 2 months.");
+                    parsedDate = null;
+                }
+            } catch (DateTimeParseException e) {
+                System.out.println("Error: Invalid date value. Please enter a correct date.");
+            }
+        }
+        return parsedDate;
     }
     private String[] getValidStartAndEndTimes(Scanner scanner, LocalDate scheduledDate, int advanceBookingHours) {
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
