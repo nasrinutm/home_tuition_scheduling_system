@@ -7,63 +7,15 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Admin extends Person {
+public class Admin extends Person implements Schedulable {
 
     public Admin(String username, String password) {
         super("Admin", username, password);
     }
+    
+    // --- METHODS REMOVED ---
+    // addTutor, addParent, deleteTutor, deleteParent, deleteSession have been removed.
 
-    public void addTutor(Scanner scanner, Scheduler scheduler) {
-        String name = getValidatedName(scanner, "Tutor name: ");
-        // Use the new validation method for the username
-        String username = getValidUsername(scanner, scheduler);
-        String password = getValidPassword(scanner);
-        System.out.print("Subject: ");
-        String subject = scanner.nextLine();
-
-        scheduler.addTutor(new Tutor(name, username, password, subject));
-        System.out.println("Tutor " + name + " added.");
-        saveTutors(scheduler);
-    }
-
-    public void addParent(Scanner scanner, Scheduler scheduler) {
-        String name = getValidatedName(scanner, "Parent name: ");
-        // Use the new validation method for the username
-        String username = getValidUsername(scanner, scheduler);
-        String password = getValidPassword(scanner);
-        String childName = getValidatedName(scanner, "Child name: ");
-
-        scheduler.addParent(new Parent(name, username, password, childName));
-        System.out.println("Parent " + name + " added.");
-        saveParents(scheduler);
-    }
-
-    // --- NEW HELPER METHOD FOR USERNAME VALIDATION ---
-    private String getValidUsername(Scanner scanner, Scheduler scheduler) {
-        String username;
-        // Regex for 5-12 alphanumeric characters (more than 4)
-        String usernamePattern = "^[a-zA-Z0-9]{5,12}$";
-        
-        while (true) {
-            System.out.print("Username (5-12 chars, letters and digits only): ");
-            username = scanner.nextLine();
-            
-            if (username == null || !username.matches(usernamePattern)) {
-                System.out.println("Invalid format. Username must be 5-12 characters long and contain only letters and digits.");
-                continue;
-            }
-            
-            if (scheduler.isUsernameTaken(username)) {
-                System.out.println("Error: This username is already taken. Please choose another.");
-                continue;
-            }
-            
-            // If both checks pass, the username is valid
-            return username;
-        }
-    }
-
-    // --- Other methods are unchanged ---
     public void viewAllTutors(Scheduler scheduler) {
         ArrayList<Tutor> tutors = scheduler.getTutors();
         if (tutors.isEmpty()) {
@@ -100,7 +52,7 @@ public class Admin extends Person {
             System.out.println(s.getDetails());
         }
     }
-    
+
     public void scheduleSession(Scanner scanner, Scheduler scheduler) {
         if (scheduler.getTutors().isEmpty() || scheduler.getParents().isEmpty()) {
             System.out.println("Add at least one tutor and one parent before scheduling.");
@@ -197,113 +149,13 @@ public class Admin extends Person {
         System.out.println("Session rescheduled successfully.");
         saveSessions(scheduler);
     }
-    public void deleteTutor(Scanner scanner, Scheduler scheduler) {
-        if (scheduler.getTutors().isEmpty()) {
-            System.out.println("There are no tutors to delete.");
-            return;
-        }
-        System.out.println("\nSelect a tutor to delete:");
-        ArrayList<Tutor> tutors = scheduler.getTutors();
-        for (int i = 0; i < tutors.size(); i++) {
-            System.out.println((i + 1) + ": " + tutors.get(i).getName());
-        }
-        System.out.print("Choose tutor number: ");
-        int tutorIndex = tryReadInt(scanner) - 1;
-        if (tutorIndex < 0 || tutorIndex >= tutors.size()) {
-            System.out.println("Invalid tutor number.");
-            return;
-        }
-        Tutor tutorToDelete = tutors.get(tutorIndex);
-        scheduler.deleteTutor(tutorToDelete);
-        System.out.println("Tutor '" + tutorToDelete.getName() + "' and all associated sessions have been deleted.");
-        saveTutors(scheduler);
-        saveSessions(scheduler);
-    }
-
-    public void deleteParent(Scanner scanner, Scheduler scheduler) {
-        if (scheduler.getParents().isEmpty()) {
-            System.out.println("There are no parents to delete.");
-            return;
-        }
-        System.out.println("\nSelect a parent to delete:");
-        ArrayList<Parent> parents = scheduler.getParents();
-        for (int i = 0; i < parents.size(); i++) {
-            System.out.println((i + 1) + ": " + parents.get(i).getName());
-        }
-        System.out.print("Choose parent number: ");
-        int parentIndex = tryReadInt(scanner) - 1;
-        if (parentIndex < 0 || parentIndex >= parents.size()) {
-            System.out.println("Invalid parent number.");
-            return;
-        }
-        Parent parentToDelete = parents.get(parentIndex);
-        scheduler.deleteParent(parentToDelete);
-        System.out.println("Parent '" + parentToDelete.getName() + "' and all associated sessions have been deleted.");
-        saveParents(scheduler);
-        saveSessions(scheduler);
-    }
-
-    public void deleteSession(Scanner scanner, Scheduler scheduler) {
-        if (scheduler.getSessions().isEmpty()) {
-            System.out.println("There are no sessions to delete.");
-            return;
-        }
-        System.out.println("\nSelect a session to delete:");
-        ArrayList<Session> sessions = scheduler.getSessions();
-        for (int i = 0; i < sessions.size(); i++) {
-            System.out.println((i + 1) + ": " + sessions.get(i).getDetails());
-        }
-        System.out.print("Choose session number: ");
-        int sessionIndex = tryReadInt(scanner) - 1;
-        if (sessionIndex < 0 || sessionIndex >= sessions.size()) {
-            System.out.println("Invalid session number.");
-            return;
-        }
-        scheduler.deleteSessionByIndex(sessionIndex);
-        System.out.println("Session deleted successfully.");
-        saveSessions(scheduler);
-    }
-    private String getValidPassword(Scanner scanner) {
-        String password;
-        String passwordPattern = "^[a-zA-Z0-9]{6,12}$";
-        
-        while (true) {
-            System.out.print("Password (6-12 characters, letters and digits only): ");
-            password = scanner.nextLine();
-            if (password != null && password.matches(passwordPattern)) {
-                return password;
-            } else {
-                System.out.println("Invalid password. Please ensure it is 6-12 characters long and contains only letters and digits.");
-            }
-        }
-    }
+    
+    // --- Private Helper Methods ---
     private int tryReadInt(Scanner scanner) {
         try { return Integer.parseInt(scanner.nextLine()); } 
         catch (NumberFormatException e) { return -1; }
     }
-    private String getValidatedName(Scanner scanner, String prompt) {
-        String name;
-        while (true) {
-            System.out.print(prompt);
-            name = scanner.nextLine();
-            if (name != null && !name.trim().isEmpty() && name.matches("^[a-zA-Z\\s]+$")) {
-                return formatName(name);
-            } else {
-                System.out.println("Invalid input. Name must contain only letters and spaces.");
-            }
-        }
-    }
-    private String formatName(String name) {
-        if (name == null || name.trim().isEmpty()) return "";
-        String[] words = name.trim().toLowerCase().split("\\s+");
-        StringBuilder formattedName = new StringBuilder();
-        for (String word : words) {
-            if (word.length() > 0) {
-                formattedName.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1)).append(" ");
-            }
-        }
-        return formattedName.toString().trim();
-    }
+
     private LocalDate getValidDate(Scanner scanner) {
         LocalDate parsedDate = null;
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
@@ -321,6 +173,7 @@ public class Admin extends Person {
                 String year = parts[2];
                 String standardizedDateStr = day + "-" + month + "-" + year;
                 parsedDate = LocalDate.parse(standardizedDateStr, dateFormatter);
+
                 if (parsedDate.equals(LocalDate.now()) && LocalTime.now().getHour() >= 16) {
                     System.out.println("Error: It is past 4 PM, so you cannot book a session for today.");
                     parsedDate = null; 
@@ -373,16 +226,6 @@ public class Admin extends Person {
                 System.out.println("Error: Invalid time format. Please use HH:mm and try again.");
             }
         }
-    }
-    private void saveTutors(Scheduler scheduler) {
-        try { scheduler.exportTutors("tutors.txt");
-            System.out.println("Tutors automatically saved to tutors.txt");
-        } catch (Exception e) { System.out.println("Export failed: " + e.getMessage()); }
-    }
-    private void saveParents(Scheduler scheduler) {
-        try { scheduler.exportParents("parents.txt");
-            System.out.println("Parents automatically saved to parents.txt");
-        } catch (Exception e) { System.out.println("Export failed: " + e.getMessage()); }
     }
     private void saveSessions(Scheduler scheduler) {
         try { scheduler.saveSessionsToFile("sessions.txt");
