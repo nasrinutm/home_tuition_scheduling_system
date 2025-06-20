@@ -13,8 +13,10 @@ public class Menu {
 
     public void show() {
         if (loggedInUser instanceof Admin) {
+            System.out.println("Welcome, " + loggedInUser.getName() + ".");
             showAdminMenu();
         } else if (loggedInUser instanceof Parent) {
+            System.out.println("Welcome, " + loggedInUser.getName() + ".");
             showParentMenu();
         } else {
             System.out.println("Welcome, " + loggedInUser.getName() + ".");
@@ -48,22 +50,43 @@ public class Menu {
                 continue;
             }
 
-            switch (option) {
-                case 1 -> adminUser.addTutor(scanner, scheduler);
-                case 2 -> adminUser.addParent(scanner, scheduler);
-                case 3 -> adminUser.scheduleSession(scanner, scheduler);
-                case 4 -> adminUser.rescheduleSession(scanner, scheduler); // --- NEW ---
-                case 5 -> adminUser.viewAllSessions(scheduler);
-                case 6 -> adminUser.viewAllTutors(scheduler);
-                case 7 -> adminUser.viewAllParents(scheduler);
-                case 8 -> adminUser.deleteSession(scanner, scheduler);
-                case 9 -> adminUser.deleteTutor(scanner, scheduler);
-                case 10 -> adminUser.deleteParent(scanner, scheduler);
-                case 11 -> { // --- RE-NUMBERED ---
+           switch (option) {
+                case 1:
+                    adminUser.addTutor(scanner, scheduler);
+                    break;
+                case 2:
+                    adminUser.addParent(scanner, scheduler);
+                    break;
+                case 3:
+                    adminUser.scheduleSession(scanner, scheduler);
+                    break;
+                case 4:
+                    adminUser.rescheduleSession(scanner, scheduler);
+                    break;
+                case 5:
+                    adminUser.viewAllSessions(scheduler);
+                    break;
+                case 6:
+                    adminUser.viewAllTutors(scheduler);
+                    break;
+                case 7:
+                    adminUser.viewAllParents(scheduler);
+                    break;
+                case 8:
+                    adminUser.deleteSession(scanner, scheduler);
+                    break;
+                case 9:
+                    adminUser.deleteTutor(scanner, scheduler);
+                    break;
+                case 10:
+                    adminUser.deleteParent(scanner, scheduler);
+                    break;
+                case 11:
                     System.out.println("Exiting system.");
                     return;
-                }
-                default -> System.out.println("Invalid option.");
+                default:
+                    System.out.println("Invalid option.");
+                    break;
             }
         }
     }
@@ -89,16 +112,25 @@ public class Menu {
                 continue;
             }
 
-            switch (option) {
-                case 1 -> parentUser.scheduleSession(scanner, scheduler);
-                case 2 -> parentUser.rescheduleMySession(scanner, scheduler); // --- NEW ---
-                case 3 -> parentUser.viewMySessions(scheduler);
-                case 4 -> parentUser.cancelMySession(scanner, scheduler);
-                case 5 -> { // --- RE-NUMBERED ---
+           switch (option) {
+                case 1:
+                    parentUser.scheduleSession(scanner, scheduler);
+                    break;
+                case 2:
+                    parentUser.rescheduleMySession(scanner, scheduler);
+                    break;
+                case 3:
+                    parentUser.viewMySessions(scheduler);
+                    break;
+                case 4:
+                    parentUser.cancelMySession(scanner, scheduler);
+                    break;
+                case 5:
                     System.out.println("Exiting system.");
                     return;
-                }
-                default -> System.out.println("Invalid option.");
+                default:
+                    System.out.println("Invalid option.");
+                    break;
             }
         }
     }

@@ -7,12 +7,6 @@ public class Scheduler {
     private ArrayList<Parent> parents = new ArrayList<>();
     private ArrayList<Session> sessions = new ArrayList<>();
 
-    // --- NEW METHOD FOR USERNAME VALIDATION ---
-    /**
-     * Checks if a username is already in use by any Tutor or Parent.
-     * @param username The username to check.
-     * @return true if the username is taken, false otherwise.
-     */
     public boolean isUsernameTaken(String username) {
         // Check against all tutor usernames
         for (Tutor tutor : tutors) {
