@@ -57,7 +57,7 @@ public class Parent extends Person {
     }
 
     // --- Other methods are unchanged ---
-    public void viewMySessions(Scheduler scheduler) {
+    public void viewSessions(Scheduler scheduler) {
         ArrayList<Session> mySessions = scheduler.getSessionsForParent(this);
         if (mySessions.isEmpty()) {
             System.out.println("\nYou do not have any scheduled sessions.");

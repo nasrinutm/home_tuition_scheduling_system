@@ -1,3 +1,7 @@
+
+import java.util.ArrayList;
+
+
 public class Tutor extends Person {
     private String subject;
 
@@ -8,5 +12,20 @@ public class Tutor extends Person {
     
     public String getSubject() { 
         return subject; 
+    }
+
+    @Override
+    public void viewSessions(Scheduler scheduler) {
+        ArrayList<Session> mySessions = scheduler.getSessionsForTutor(this);
+
+        if (mySessions.isEmpty()) {
+            System.out.println("\nYou have no sessions scheduled.");
+            return;
+        }
+
+        System.out.println("\n--- My Schedule ---");
+        for (Session s : mySessions) {
+            System.out.println(s.getDetails());
+        }
     }
 }

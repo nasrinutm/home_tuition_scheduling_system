@@ -88,7 +88,8 @@ public class Admin extends Person {
         }
     }
 
-    public void viewAllSessions(Scheduler scheduler) {
+    @Override
+    public void viewSessions(Scheduler scheduler) {
         ArrayList<Session> allSessions = scheduler.getSessions();
         if (allSessions.isEmpty()) {
             System.out.println("\nNo sessions have been scheduled yet.");

@@ -40,6 +40,13 @@ public class Authentication {
                         return null;
                     }
                     return p;
+                } else if ("tutor".equals(role)) { // --- NEW LOGIC FOR TUTOR ROLE ---
+                    Tutor t = scheduler.findTutorByUsername(username);
+                    if (t == null) {
+                        System.out.println("Login Error: A user account exists for '" + username + "', but no matching tutor profile was found in tutors.txt.");
+                        return null;
+                    }
+                    return t;
                 }
             }
         }

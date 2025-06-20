@@ -13,6 +13,8 @@ public abstract class Person implements Serializable {
         this.password = password;
     }
 
+    public abstract void viewSessions(Scheduler scheduler);
+
     public String getName() { return name; }
     public String getUsername() { return username; }
     public String getPassword() { return password; }

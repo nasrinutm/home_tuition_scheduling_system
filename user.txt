@@ -1,3 +1,5 @@
 admin,admin,admin
 daniel,daniel,parent
 aisha,aisha,parent
+jsmith,tutor,tutor
+ewhite,tutor,tutor

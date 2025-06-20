@@ -7,22 +7,26 @@ public class Scheduler {
     private ArrayList<Parent> parents = new ArrayList<>();
     private ArrayList<Session> sessions = new ArrayList<>();
 
-    public boolean isUsernameTaken(String username) {
-        // Check against all tutor usernames
-        for (Tutor tutor : tutors) {
-            if (tutor.getUsername().equalsIgnoreCase(username)) {
-                return true;
+    // --- NEW HELPER METHODS ---
+    public Tutor findTutorByUsername(String username) {
+        for (Tutor t : tutors) {
+            if (t.getUsername().equals(username)) {
+                return t;
             }
         }
-        // Check against all parent usernames
-        for (Parent parent : parents) {
-            if (parent.getUsername().equalsIgnoreCase(username)) {
-                return true;
-            }
-        }
-        return false;
+        return null;
     }
-    
+
+    public ArrayList<Session> getSessionsForTutor(Tutor tutorToFind) {
+        ArrayList<Session> tutorSessions = new ArrayList<>();
+        for (Session s : sessions) {
+            if (s.getTutor().equals(tutorToFind)) {
+                tutorSessions.add(s);
+            }
+        }
+        return tutorSessions;
+    }
+
     // --- Other methods are unchanged ---
     public ArrayList<Tutor> getTutors() { return tutors; }
     public ArrayList<Parent> getParents() { return parents; }
@@ -159,5 +163,21 @@ public class Scheduler {
                 }
             }
         } catch (IOException e) { System.out.println("Info: sessions.txt not found, starting fresh."); }
+    }
+
+    public boolean isUsernameTaken(String username) {
+        // Check against all tutor usernames
+        for (Tutor tutor : tutors) {
+            if (tutor.getUsername().equalsIgnoreCase(username)) {
+                return true;
+            }
+        }
+        // Check against all parent usernames
+        for (Parent parent : parents) {
+            if (parent.getUsername().equalsIgnoreCase(username)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
