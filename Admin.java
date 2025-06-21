@@ -7,15 +7,40 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Admin extends Person implements Schedulable {
+public class Admin extends Person {
 
     public Admin(String username, String password) {
         super("Admin", username, password);
     }
     
-    // --- METHODS REMOVED ---
-    // addTutor, addParent, deleteTutor, deleteParent, deleteSession have been removed.
+    // --- METHOD RE-ADDED ---
+    public void deleteSession(Scanner scanner, Scheduler scheduler) {
+        if (scheduler.getSessions().isEmpty()) {
+            System.out.println("There are no sessions to delete.");
+            return;
+        }
+        System.out.println("\nSelect a session to delete:");
+        ArrayList<Session> sessions = scheduler.getSessions();
+        for (int i = 0; i < sessions.size(); i++) {
+            System.out.println((i + 1) + ": " + sessions.get(i).getDetails());
+        }
 
+        System.out.print("Choose session number (or 0 to cancel): ");
+        int sessionChoice = tryReadInt(scanner);
+        if (sessionChoice == 0) {
+            return; // Exit the method
+        }
+        int sessionIndex = sessionChoice - 1;
+        if (sessionIndex < 0 || sessionIndex >= sessions.size()) {
+            System.out.println("Invalid session number.");
+            return;
+        }
+        scheduler.deleteSessionByIndex(sessionIndex);
+        System.out.println("Session deleted successfully.");
+        saveSessions(scheduler);
+    }
+
+    // --- Other methods are unchanged ---
     public void viewAllTutors(Scheduler scheduler) {
         ArrayList<Tutor> tutors = scheduler.getTutors();
         if (tutors.isEmpty()) {
@@ -64,8 +89,12 @@ public class Admin extends Person implements Schedulable {
         for (int i = 0; i < tutors.size(); i++) {
             System.out.println((i + 1) + ": " + tutors.get(i).getName() + " (" + tutors.get(i).getSubject() + ")");
         }
-        System.out.print("Choose Tutor number: ");
-        int tutorIndex = tryReadInt(scanner) - 1;
+        System.out.print("Choose Tutor number (or 0 to cancel): ");
+        int tutorChoice = tryReadInt(scanner);
+        if (tutorChoice == 0) {
+            return; // Exit the method
+        }
+        int tutorIndex = tutorChoice - 1;
         if (tutorIndex < 0 || tutorIndex >= tutors.size()) {
             System.out.println("Invalid tutor number.");
             return;
@@ -78,7 +107,11 @@ public class Admin extends Person implements Schedulable {
             System.out.println((i + 1) + ": " + parents.get(i).getName() + " (Child: " + parents.get(i).getChildName() + ")");
         }
         System.out.print("Choose Parent number: ");
-        int parentIndex = tryReadInt(scanner) - 1;
+        int parentChoice = tryReadInt(scanner);
+        if (parentChoice == 0) {
+            return; // Exit the method
+        }
+        int parentIndex = parentChoice - 1;
         if (parentIndex < 0 || parentIndex >= parents.size()) {
             System.out.println("Invalid parent number.");
             return;
@@ -87,7 +120,7 @@ public class Admin extends Person implements Schedulable {
 
         LocalDate scheduledDate = getValidDate(scanner);
         if (scheduledDate == null) return;
-        String[] times = getValidStartAndEndTimes(scanner, scheduledDate, 48);
+        String[] times = getValidStartAndEndTimes(scanner);
         if (times == null) return;
 
         LocalDateTime newStart = LocalDateTime.of(scheduledDate, LocalTime.parse(times[0]));
@@ -114,8 +147,12 @@ public class Admin extends Person implements Schedulable {
             System.out.println((i + 1) + ": " + sessions.get(i).getDetails());
         }
 
-        System.out.print("Choose session number: ");
-        int sessionIndex = tryReadInt(scanner) - 1;
+        System.out.print("Choose session number (or 0 to cancel): ");
+        int sessionChoice = tryReadInt(scanner);
+        if (sessionChoice == 0) {
+            return; // Exit the method
+        }
+        int sessionIndex = sessionChoice - 1;
         if (sessionIndex < 0 || sessionIndex >= sessions.size()) {
             System.out.println("Invalid session number.");
             return;
@@ -130,7 +167,7 @@ public class Admin extends Person implements Schedulable {
         System.out.println("Enter new details for the session:");
         LocalDate newDate = getValidDate(scanner);
         if (newDate == null) return;
-        String[] newTimes = getValidStartAndEndTimes(scanner, newDate, 24);
+        String[] newTimes = getValidStartAndEndTimes(scanner);
         if (newTimes == null) return;
         
         LocalDateTime newStart = LocalDateTime.of(newDate, LocalTime.parse(newTimes[0]));
@@ -149,8 +186,8 @@ public class Admin extends Person implements Schedulable {
         System.out.println("Session rescheduled successfully.");
         saveSessions(scheduler);
     }
-    
-    // --- Private Helper Methods ---
+
+    //helper method to read an integer from the scanner//
     private int tryReadInt(Scanner scanner) {
         try { return Integer.parseInt(scanner.nextLine()); } 
         catch (NumberFormatException e) { return -1; }
@@ -160,11 +197,11 @@ public class Admin extends Person implements Schedulable {
         LocalDate parsedDate = null;
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         while (parsedDate == null) {
-            System.out.print("Enter Date (dd-MM-yyyy): ");
+            System.out.print("Enter Date (DD/MM/YYYY): ");
             String dateStr = scanner.nextLine();
-            String[] parts = dateStr.split("-");
+            String[] parts = dateStr.split("/");
             if (parts.length != 3) {
-                System.out.println("Error: Invalid date format. Please use dd-MM-yyyy.");
+                System.out.println("Error: Invalid date format. Please use DD/MM/YYYY.");
                 continue;
             }
             try {
@@ -174,17 +211,15 @@ public class Admin extends Person implements Schedulable {
                 String standardizedDateStr = day + "-" + month + "-" + year;
                 parsedDate = LocalDate.parse(standardizedDateStr, dateFormatter);
 
-                if (parsedDate.equals(LocalDate.now()) && LocalTime.now().getHour() >= 16) {
-                    System.out.println("Error: It is past 4 PM, so you cannot book a session for today.");
-                    parsedDate = null; 
+                LocalDate earliestValidDate = LocalDate.now().plusDays(2);
+                if (parsedDate.isBefore(earliestValidDate)) {
+                    System.out.println("Error: Bookings must be made at least 2 days in advance.");
+                    parsedDate = null;
                     continue;
                 }
-                LocalDateTime maxBookingDate = LocalDateTime.now().plusMonths(2);
-                if (parsedDate.isBefore(LocalDate.now())) {
-                    System.out.println("Error: Cannot book a session on a past date.");
-                    parsedDate = null; continue;
-                }
-                if (parsedDate.atStartOfDay().isAfter(maxBookingDate)) {
+                
+                LocalDate maxValidDate = LocalDate.now().plusMonths(2);
+                if (parsedDate.isAfter(maxValidDate)) {
                     System.out.println("Error: Session must be booked within the next 2 months.");
                     parsedDate = null;
                 }
@@ -194,14 +229,16 @@ public class Admin extends Person implements Schedulable {
         }
         return parsedDate;
     }
-    private String[] getValidStartAndEndTimes(Scanner scanner, LocalDate scheduledDate, int advanceBookingHours) {
+
+    // --- MODIFIED: Removed the now-redundant advance booking hour check ---
+    private String[] getValidStartAndEndTimes(Scanner scanner) {
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
         LocalTime startTime, endTime;
         while (true) {
             try {
-                System.out.print("Enter Start Time (HH:mm 24-hour format): ");
+                System.out.print("Enter Start Time (HH:MM 24-hour format): ");
                 startTime = LocalTime.parse(scanner.nextLine(), timeFormatter);
-                System.out.print("Enter End Time (HH:mm 24-hour format): ");
+                System.out.print("Enter End Time (HH:MM 24-hour format): ");
                 endTime = LocalTime.parse(scanner.nextLine(), timeFormatter);
                 if (!endTime.isAfter(startTime)) {
                     System.out.println("Error: End time must be after the start time.");
@@ -216,17 +253,15 @@ public class Admin extends Person implements Schedulable {
                     System.out.println("Error: Session duration must be between 1 and 3 hours.");
                     continue;
                 }
-                LocalDateTime scheduledStartDateTime = LocalDateTime.of(scheduledDate, startTime);
-                if (scheduledStartDateTime.isBefore(LocalDateTime.now().plusHours(advanceBookingHours))) {
-                    System.out.println("Error: Session must be booked at least " + advanceBookingHours + " hours in advance.");
-                    return null;
-                }
+                // The precise hour check has been removed as per the new simplified rule.
                 return new String[]{startTime.format(timeFormatter), endTime.format(timeFormatter)};
             } catch (DateTimeParseException e) {
                 System.out.println("Error: Invalid time format. Please use HH:mm and try again.");
             }
         }
-    }
+    } 
+    // --- Other methods are unchanged --//
+    
     private void saveSessions(Scheduler scheduler) {
         try { scheduler.saveSessionsToFile("sessions.txt");
             System.out.println("Sessions automatically saved to sessions.txt");

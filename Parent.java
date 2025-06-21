@@ -15,9 +15,6 @@ public class Parent extends Person implements Schedulable{
         super(name, username, password);
         this.childName = childName;
     }
-    
-    // --- METHOD REMOVED ---
-    // cancelMySession has been removed.
 
     @Override
     public void viewSessions(Scheduler scheduler) {
@@ -50,7 +47,7 @@ public class Parent extends Person implements Schedulable{
         Tutor selectedTutor = tutors.get(tutorIndex);
         LocalDate scheduledDate = getValidDate(scanner);
         if (scheduledDate == null) return;
-        String[] times = getValidStartAndEndTimes(scanner, scheduledDate, 48);
+        String[] times = getValidStartAndEndTimes(scanner);
         if (times == null) return;
         LocalDateTime newStart = LocalDateTime.of(scheduledDate, LocalTime.parse(times[0]));
         LocalDateTime newEnd = LocalDateTime.of(scheduledDate, LocalTime.parse(times[1]));
@@ -91,7 +88,7 @@ public class Parent extends Person implements Schedulable{
         System.out.println("Enter new details for the session:");
         LocalDate newDate = getValidDate(scanner);
         if (newDate == null) return;
-        String[] newTimes = getValidStartAndEndTimes(scanner, newDate, 24);
+        String[] newTimes = getValidStartAndEndTimes(scanner);
         if (newTimes == null) return;
 
         LocalDateTime newStart = LocalDateTime.of(newDate, LocalTime.parse(newTimes[0]));
@@ -122,11 +119,11 @@ public class Parent extends Person implements Schedulable{
         LocalDate parsedDate = null;
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         while (parsedDate == null) {
-            System.out.print("Enter Date (dd-MM-yyyy): ");
+            System.out.print("Enter Date (DD/MM/YYYY): ");
             String dateStr = scanner.nextLine();
-            String[] parts = dateStr.split("-");
+            String[] parts = dateStr.split("/");
             if (parts.length != 3) {
-                System.out.println("Error: Invalid date format. Please use dd-MM-yyyy.");
+                System.out.println("Error: Invalid date format. Please use DD/MM/YYYY.");
                 continue;
             }
             try {
@@ -135,17 +132,16 @@ public class Parent extends Person implements Schedulable{
                 String year = parts[2];
                 String standardizedDateStr = day + "-" + month + "-" + year;
                 parsedDate = LocalDate.parse(standardizedDateStr, dateFormatter);
-                if (parsedDate.equals(LocalDate.now()) && LocalTime.now().getHour() >= 16) {
-                    System.out.println("Error: It is past 4 PM, so you cannot book a session for today.");
-                    parsedDate = null; 
+
+                LocalDate earliestValidDate = LocalDate.now().plusDays(2);
+                if (parsedDate.isBefore(earliestValidDate)) {
+                    System.out.println("Error: Bookings must be made at least 2 days in advance.");
+                    parsedDate = null;
                     continue;
                 }
-                LocalDateTime maxBookingDate = LocalDateTime.now().plusMonths(2);
-                if (parsedDate.isBefore(LocalDate.now())) {
-                    System.out.println("Error: Cannot book a session on a past date.");
-                    parsedDate = null; continue;
-                }
-                if (parsedDate.atStartOfDay().isAfter(maxBookingDate)) {
+                
+                LocalDate maxValidDate = LocalDate.now().plusMonths(2);
+                if (parsedDate.isAfter(maxValidDate)) {
                     System.out.println("Error: Session must be booked within the next 2 months.");
                     parsedDate = null;
                 }
@@ -155,14 +151,16 @@ public class Parent extends Person implements Schedulable{
         }
         return parsedDate;
     }
-    private String[] getValidStartAndEndTimes(Scanner scanner, LocalDate scheduledDate, int advanceBookingHours) {
+
+    // --- MODIFIED: Removed the now-redundant advance booking hour check ---
+    private String[] getValidStartAndEndTimes(Scanner scanner) {
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
         LocalTime startTime, endTime;
         while (true) {
             try {
-                System.out.print("Enter Start Time (HH:mm 24-hour format): ");
+                System.out.print("Enter Start Time (HH:MM 24-hour format): ");
                 startTime = LocalTime.parse(scanner.nextLine(), timeFormatter);
-                System.out.print("Enter End Time (HH:mm 24-hour format): ");
+                System.out.print("Enter End Time (HH:MM 24-hour format): ");
                 endTime = LocalTime.parse(scanner.nextLine(), timeFormatter);
                 if (!endTime.isAfter(startTime)) {
                     System.out.println("Error: End time must be after the start time.");
@@ -176,11 +174,6 @@ public class Parent extends Person implements Schedulable{
                 if (durationMinutes < 60 || durationMinutes > 180) {
                     System.out.println("Error: Session duration must be between 1 and 3 hours.");
                     continue;
-                }
-                LocalDateTime scheduledStartDateTime = LocalDateTime.of(scheduledDate, startTime);
-                if (scheduledStartDateTime.isBefore(LocalDateTime.now().plusHours(advanceBookingHours))) {
-                    System.out.println("Error: Session must be booked at least " + advanceBookingHours + " hours in advance.");
-                    return null;
                 }
                 return new String[]{startTime.format(timeFormatter), endTime.format(timeFormatter)};
             } catch (DateTimeParseException e) {

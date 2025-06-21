@@ -31,7 +31,8 @@ public class Menu {
             System.out.println("3. View All Sessions");
             System.out.println("4. View All Tutors");
             System.out.println("5. View All Parents");
-            System.out.println("6. Exit");
+            System.out.println("6. Delete a Session"); // --- NEW ---
+            System.out.println("7. Exit");             // --- RE-NUMBERED ---
             System.out.print("Choose option: ");
 
             int option;
@@ -58,7 +59,10 @@ public class Menu {
                 case 5:
                     adminUser.viewAllParents(scheduler);
                     break;
-                case 6:
+                case 6: // --- NEW ---
+                    adminUser.deleteSession(scanner, scheduler);
+                    break;
+                case 7: // --- RE-NUMBERED ---
                     System.out.println("Exiting system.");
                     return;
                 default:
@@ -110,9 +114,8 @@ public class Menu {
         System.out.println("\nWelcome, " + tutorUser.getName() + "!");
         while (true) {
             System.out.println("\n---- Tutor Menu ----");
-            System.out.println("1. Schedule a Session");
-            System.out.println("2. View My Schedule");
-            System.out.println("3. Exit");
+            System.out.println("1. View My Schedule");
+            System.out.println("2. Exit");
             System.out.print("Choose option: ");
 
             int option;
@@ -125,12 +128,9 @@ public class Menu {
 
             switch (option) {
                 case 1:
-                    tutorUser.scheduleSession(scanner, scheduler);
-                    break;
-                case 2:
                     tutorUser.viewSessions(scheduler);
                     break;
-                case 3:
+                case 2:
                     System.out.println("Exiting system.");
                     return;
                 default:
