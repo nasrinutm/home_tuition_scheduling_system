@@ -1,5 +1,5 @@
+import javax.swing.JOptionPane;
 import java.util.ArrayList;
-
 
 public class Tutor extends Person {
     private String subject;
@@ -16,13 +16,15 @@ public class Tutor extends Person {
     public void viewSessions(Scheduler scheduler) {
         ArrayList<Session> mySessions = scheduler.getSessionsForTutor(this);
         if (mySessions.isEmpty()) {
-            System.out.println("\nYou have no sessions scheduled.");
+            JOptionPane.showMessageDialog(null, "You have no sessions scheduled.");
             return;
         }
-        System.out.println("\n--- My Schedule ---");
-        for (Session s : mySessions) {
-            System.out.println(s.getDetails());
-        }
-    }
 
+        StringBuilder scheduleText = new StringBuilder();
+        scheduleText.append("--- My Schedule ---\n");
+        for (Session s : mySessions) {
+            scheduleText.append(s.getDetails()).append("\n");
+        }
+        JOptionPane.showMessageDialog(null, scheduleText.toString(), "My Schedule", JOptionPane.INFORMATION_MESSAGE);
+    }
 }

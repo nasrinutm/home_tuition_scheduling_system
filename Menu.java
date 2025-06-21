@@ -1,14 +1,12 @@
-import java.util.Scanner;
+import javax.swing.JOptionPane;
 
 public class Menu {
     private Person loggedInUser;
     private Scheduler scheduler;
-    private Scanner scanner;
 
-    public Menu(Person user, Scheduler scheduler, Scanner scanner) {
+    public Menu(Person user, Scheduler scheduler) {
         this.loggedInUser = user;
         this.scheduler = scheduler;
-        this.scanner = scanner;
     }
 
     public void show() {
@@ -19,36 +17,42 @@ public class Menu {
         } else if (loggedInUser instanceof Tutor tutorUser) {
             showTutorMenu(tutorUser);
         } else {
-            System.out.println("Unknown user role. Exiting.");
+            JOptionPane.showMessageDialog(null, "Unknown user role. Exiting.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     public void showAdminMenu(Admin adminUser) {
         while (true) {
-            System.out.println("\n---- Admin Menu ----");
-            System.out.println("1. Schedule Session");
-            System.out.println("2. Reschedule a Session");
-            System.out.println("3. View All Sessions");
-            System.out.println("4. View All Tutors");
-            System.out.println("5. View All Parents");
-            System.out.println("6. Delete a Session"); // --- NEW ---
-            System.out.println("7. Exit");             // --- RE-NUMBERED ---
-            System.out.print("Choose option: ");
+            StringBuilder menuText = new StringBuilder();
+            menuText.append("---- Admin Menu ----\n");
+            menuText.append("1. Schedule Session\n");
+            menuText.append("2. Reschedule a Session\n");
+            menuText.append("3. View All Sessions\n");
+            menuText.append("4. View All Tutors\n");
+            menuText.append("5. View All Parents\n");
+            menuText.append("6. Delete a Session\n");
+            menuText.append("7. Exit");
+
+            String choiceStr = JOptionPane.showInputDialog(null, menuText.toString(), "Admin Menu", JOptionPane.PLAIN_MESSAGE);
+
+            if (choiceStr == null) { // User canceled or closed the dialog
+                break;
+            }
 
             int option;
             try {
-                option = Integer.parseInt(scanner.nextLine());
+                option = Integer.parseInt(choiceStr);
             } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Enter a number.");
+                JOptionPane.showMessageDialog(null, "Invalid input. Enter a number.", "Error", JOptionPane.ERROR_MESSAGE);
                 continue;
             }
 
             switch (option) {
                 case 1:
-                    adminUser.scheduleSession(scanner, scheduler);
+                    adminUser.scheduleSession(scheduler);
                     break;
                 case 2:
-                    adminUser.rescheduleSession(scanner, scheduler);
+                    adminUser.rescheduleSession(scheduler);
                     break;
                 case 3:
                     adminUser.viewSessions(scheduler);
@@ -59,70 +63,82 @@ public class Menu {
                 case 5:
                     adminUser.viewAllParents(scheduler);
                     break;
-                case 6: // --- NEW ---
-                    adminUser.deleteSession(scanner, scheduler);
+                case 6:
+                    adminUser.deleteSession(scheduler);
                     break;
-                case 7: // --- RE-NUMBERED ---
-                    System.out.println("Exiting system.");
+                case 7:
+                    JOptionPane.showMessageDialog(null, "Exiting system.");
                     return;
                 default:
-                    System.out.println("Invalid option.");
+                    JOptionPane.showMessageDialog(null, "Invalid option.", "Warning", JOptionPane.WARNING_MESSAGE);
                     break;
             }
         }
     }
 
     public void showParentMenu(Parent parentUser) {
-        System.out.println("\nWelcome, " + parentUser.getName() + "!");
+        JOptionPane.showMessageDialog(null, "Welcome, " + parentUser.getName() + "!");
         while (true) {
-            System.out.println("\n---- Parent Menu ----");
-            System.out.println("1. Schedule a Session");
-            System.out.println("2. Reschedule My Session");
-            System.out.println("3. View My Sessions");
-            System.out.println("4. Exit");
-            System.out.print("Choose option: ");
+            StringBuilder menuText = new StringBuilder();
+            menuText.append("---- Parent Menu ----\n");
+            menuText.append("1. Schedule a Session\n");
+            menuText.append("2. Reschedule My Session\n");
+            menuText.append("3. View My Sessions\n");
+            menuText.append("4. Exit");
 
+            String choiceStr = JOptionPane.showInputDialog(null, menuText.toString(), "Parent Menu", JOptionPane.PLAIN_MESSAGE);
+
+            if (choiceStr == null) { // User canceled or closed the dialog
+                break;
+            }
+            
             int option;
             try {
-                option = Integer.parseInt(scanner.nextLine());
+                option = Integer.parseInt(choiceStr);
             } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Enter a number.");
+                JOptionPane.showMessageDialog(null, "Invalid input. Enter a number.", "Error", JOptionPane.ERROR_MESSAGE);
                 continue;
             }
 
             switch (option) {
                 case 1:
-                    parentUser.scheduleSession(scanner, scheduler);
+                    parentUser.scheduleSession(scheduler);
                     break;
                 case 2:
-                    parentUser.rescheduleSession(scanner, scheduler);
+                    parentUser.rescheduleSession(scheduler);
                     break;
                 case 3:
                     parentUser.viewSessions(scheduler);
                     break;
                 case 4:
-                    System.out.println("Exiting system.");
+                    JOptionPane.showMessageDialog(null, "Exiting system.");
                     return;
                 default:
-                    System.out.println("Invalid option.");
+                    JOptionPane.showMessageDialog(null, "Invalid option.", "Warning", JOptionPane.WARNING_MESSAGE);
                     break;
             }
         }
     }
     
     public void showTutorMenu(Tutor tutorUser) {
-        System.out.println("\nWelcome, " + tutorUser.getName() + "!");
+        JOptionPane.showMessageDialog(null, "Welcome, " + tutorUser.getName() + "!");
         while (true) {
-            System.out.println("\n---- Tutor Menu ----");
-            System.out.println("1. View My Schedule");
-            System.out.println("2. Exit");
-            System.out.print("Choose option: ");
+            StringBuilder menuText = new StringBuilder();
+            menuText.append("---- Tutor Menu ----\n");
+            menuText.append("1. View My Schedule\n");
+            menuText.append("2. Exit");
+            
+            String choiceStr = JOptionPane.showInputDialog(null, menuText.toString(), "Tutor Menu", JOptionPane.PLAIN_MESSAGE);
+
+            if (choiceStr == null) { // User canceled or closed the dialog
+                break;
+            }
 
             int option;
             try {
-                option = Integer.parseInt(scanner.nextLine());
+                option = Integer.parseInt(choiceStr);
             } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Enter a number.");
+                JOptionPane.showMessageDialog(null, "Invalid input. Enter a number.", "Error", JOptionPane.ERROR_MESSAGE);
                 continue;
             }
 
@@ -131,10 +147,10 @@ public class Menu {
                     tutorUser.viewSessions(scheduler);
                     break;
                 case 2:
-                    System.out.println("Exiting system.");
+                    JOptionPane.showMessageDialog(null, "Exiting system.");
                     return;
                 default:
-                    System.out.println("Invalid option.");
+                    JOptionPane.showMessageDialog(null, "Invalid option.", "Warning", JOptionPane.WARNING_MESSAGE);
                     break;
             }
         }
