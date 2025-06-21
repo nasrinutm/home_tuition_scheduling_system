@@ -1,4 +1,4 @@
-import java.util.Scanner;
+import javax.swing.JOptionPane;
 
 public class Main {
     public static void main(String[] args) {
@@ -12,23 +12,25 @@ public class Main {
         Authentication auth = new Authentication();
         auth.loadUsers("user.txt");
         
-        Scanner scanner = new Scanner(System.in);
         Person loggedInUser = null;
 
-        // Loop until a valid user logs in
+        // Loop until a valid user logs in or the user cancels
         while (loggedInUser == null) {
-            loggedInUser = auth.login(scanner, scheduler);
+            loggedInUser = auth.login(scheduler);
             if (loggedInUser == null) {
-                System.out.println("Invalid username or password. Please try again.");
+                // The login method will show its own error messages.
+                // We check if the result of the login attempt was a deliberate exit.
+                if (auth.isLoginAttemptCancelled()) {
+                    JOptionPane.showMessageDialog(null, "Application exiting.");
+                    return; // Exit the application
+                }
             }
         }
 
-        System.out.println("\nLogin successful.");
+        JOptionPane.showMessageDialog(null, "Login successful.");
         
         // Create the menu controller and pass it the logged-in user and other necessary objects
-        Menu menu = new Menu(loggedInUser, scheduler, scanner);
+        Menu menu = new Menu(loggedInUser, scheduler);
         menu.show();
-
-        scanner.close();
     }
 }
