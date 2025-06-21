@@ -7,7 +7,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Admin extends Person {
+public class Admin extends Person implements Schedulable {
 
     public Admin(String username, String password) {
         super("Admin", username, password);
@@ -188,12 +188,12 @@ public class Admin extends Person {
     }
 
     //helper method to read an integer from the scanner//
-    private int tryReadInt(Scanner scanner) {
+    public int tryReadInt(Scanner scanner) {
         try { return Integer.parseInt(scanner.nextLine()); } 
         catch (NumberFormatException e) { return -1; }
     }
 
-    private LocalDate getValidDate(Scanner scanner) {
+    public LocalDate getValidDate(Scanner scanner) {
         LocalDate parsedDate = null;
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         while (parsedDate == null) {
@@ -231,7 +231,7 @@ public class Admin extends Person {
     }
 
     // --- MODIFIED: Removed the now-redundant advance booking hour check ---
-    private String[] getValidStartAndEndTimes(Scanner scanner) {
+    public String[] getValidStartAndEndTimes(Scanner scanner) {
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
         LocalTime startTime, endTime;
         while (true) {
@@ -262,7 +262,7 @@ public class Admin extends Person {
     } 
     // --- Other methods are unchanged --//
     
-    private void saveSessions(Scheduler scheduler) {
+    public void saveSessions(Scheduler scheduler) {
         try { scheduler.saveSessionsToFile("sessions.txt");
             System.out.println("Sessions automatically saved to sessions.txt");
         } catch (Exception e) { System.out.println("Save failed: " + e.getMessage()); }

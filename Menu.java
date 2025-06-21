@@ -23,7 +23,7 @@ public class Menu {
         }
     }
 
-    private void showAdminMenu(Admin adminUser) {
+    public void showAdminMenu(Admin adminUser) {
         while (true) {
             System.out.println("\n---- Admin Menu ----");
             System.out.println("1. Schedule Session");
@@ -72,7 +72,7 @@ public class Menu {
         }
     }
 
-    private void showParentMenu(Parent parentUser) {
+    public void showParentMenu(Parent parentUser) {
         System.out.println("\nWelcome, " + parentUser.getName() + "!");
         while (true) {
             System.out.println("\n---- Parent Menu ----");
@@ -95,7 +95,7 @@ public class Menu {
                     parentUser.scheduleSession(scanner, scheduler);
                     break;
                 case 2:
-                    parentUser.rescheduleMySession(scanner, scheduler);
+                    parentUser.rescheduleSession(scanner, scheduler);
                     break;
                 case 3:
                     parentUser.viewSessions(scheduler);
@@ -110,7 +110,7 @@ public class Menu {
         }
     }
     
-    private void showTutorMenu(Tutor tutorUser) {
+    public void showTutorMenu(Tutor tutorUser) {
         System.out.println("\nWelcome, " + tutorUser.getName() + "!");
         while (true) {
             System.out.println("\n---- Tutor Menu ----");

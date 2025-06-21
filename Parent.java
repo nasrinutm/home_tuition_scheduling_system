@@ -60,7 +60,7 @@ public class Parent extends Person implements Schedulable{
         System.out.println("Session scheduled successfully with " + selectedTutor.getName() + ".");
         saveSessions(scheduler);
     }
-    public void rescheduleMySession(Scanner scanner, Scheduler scheduler) {
+    public void rescheduleSession(Scanner scanner, Scheduler scheduler) {
         ArrayList<Session> parentSessions = scheduler.getSessionsForParent(this);
         if (parentSessions.isEmpty()) {
             System.out.println("You have no sessions to reschedule.");
@@ -111,11 +111,11 @@ public class Parent extends Person implements Schedulable{
     public String getChildName() {
         return childName;
     }
-    private int tryReadInt(Scanner scanner) {
+    public int tryReadInt(Scanner scanner) {
         try { return Integer.parseInt(scanner.nextLine()); } 
         catch (NumberFormatException e) { return -1; }
     }
-    private LocalDate getValidDate(Scanner scanner) {
+    public LocalDate getValidDate(Scanner scanner) {
         LocalDate parsedDate = null;
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         while (parsedDate == null) {
@@ -153,7 +153,7 @@ public class Parent extends Person implements Schedulable{
     }
 
     // --- MODIFIED: Removed the now-redundant advance booking hour check ---
-    private String[] getValidStartAndEndTimes(Scanner scanner) {
+    public String[] getValidStartAndEndTimes(Scanner scanner) {
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
         LocalTime startTime, endTime;
         while (true) {
@@ -181,7 +181,7 @@ public class Parent extends Person implements Schedulable{
             }
         }
     }
-    private void saveSessions(Scheduler scheduler) {
+    public void saveSessions(Scheduler scheduler) {
         try {
             scheduler.saveSessionsToFile("sessions.txt");
             System.out.println("Sessions automatically saved to sessions.txt");

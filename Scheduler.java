@@ -97,13 +97,13 @@ public class Scheduler {
         }
         return null;
     }
-    private Tutor findTutorByName(String name) {
+    public Tutor findTutorByName(String name) {
         for (Tutor t : tutors) {
             if (t.getName().equals(name)) { return t; }
         }
         return null;
     }
-    private Parent findParentByName(String name) {
+    public Parent findParentByName(String name) {
         for (Parent p : parents) {
             if (p.getName().equals(name)) { return p; }
         }
