@@ -1,0 +1,6 @@
+#username, password, role
+admin,admin,admin
+aisha,aisha,parent
+daniel,daniel,parent
+jsmith,tutor,tutor
+ewhite,tutor,tutor

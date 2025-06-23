@@ -1,4 +1,0 @@
-#name, username, password, subject
-John Smith,jsmith,tutor1pass,Mathematics
-Emily White,ewhite,tutor2pass,Science
-Nasrin,nasrintutor,nasrin,OOP
